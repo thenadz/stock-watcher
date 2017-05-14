@@ -9,6 +9,7 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
 {
     [DataContract]
     public abstract class AbstractReq<TResponse>
+        where TResponse : class
     {
         /// <summary>
         /// Don't access directly. Use wrapper property.
@@ -18,15 +19,13 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
         /// <summary>
         /// Don't access directly. Use wrapper property.
         /// </summary>
-        private JsonSerializer respDeserializer;
+        private JsonSerializer serializer;
 
         public abstract string RequestUri { get; }
 
         public virtual string RequestMethod { get; } = "POST";
 
-        private DataContractJsonSerializer ReqSerializer => reqSerializer ?? (reqSerializer = new DataContractJsonSerializer(GetType()));
-
-        private JsonSerializer RespDeserializer => respDeserializer ?? (respDeserializer = new JsonSerializer());
+        private JsonSerializer Serializer => serializer ?? (serializer = new JsonSerializer());
 
         public TResponse GetResponse(string userAgent, Uri referer, CookieContainer cookies, string pageId)
         {
@@ -44,12 +43,19 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
             hwr.Accept = "*/*";
             hwr.Referer = referer.OriginalString;
             hwr.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
-            ReqSerializer.WriteObject(hwr.GetRequestStream(), this);
 
+            // serialize request to the wire
+            using (StreamWriter writer = new StreamWriter(hwr.GetRequestStream()))
+            using (JsonTextWriter jwriter = new JsonTextWriter(writer))
+            {
+                Serializer.Serialize(jwriter, this);
+            }
+
+            // deserialize response from the wire
             using (StreamReader sr = new StreamReader(hwr.GetResponse().GetResponseStream()))
             using (JsonTextReader jsonTextReader = new JsonTextReader(sr))
             {
-                return RespDeserializer.Deserialize<TResponse>(jsonTextReader);
+                return Serializer.Deserialize<TResponse>(jsonTextReader);
             }
         }
     }
