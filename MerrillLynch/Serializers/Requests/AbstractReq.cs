@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
 using Newtonsoft.Json;
 
 namespace StockWatcher.MerrillLynch.Serializers.Requests
@@ -11,11 +10,6 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
     public abstract class AbstractReq<TResponse>
         where TResponse : class
     {
-        /// <summary>
-        /// Don't access directly. Use wrapper property.
-        /// </summary>
-        private DataContractJsonSerializer reqSerializer;
-
         /// <summary>
         /// Don't access directly. Use wrapper property.
         /// </summary>
