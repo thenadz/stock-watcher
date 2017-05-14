@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using StockWatcher.MerrillLynch.Serializers.Objects;
 using StockWatcher.MerrillLynch.Serializers.Requests;
 using StockWatcher.MerrillLynch.Serializers.Responses;
 
@@ -71,9 +72,9 @@ namespace StockWatcher.MerrillLynch
             driverService.Dispose();
         }
 
-        public StockDataResp TestGetData()
+        public GetQuoteResp TestGetData()
         {
-            StockDataReq req = new StockDataReq
+            GetQuoteReq req = new GetQuoteReq
             {
                 Data = new StockDataReqData
                 {
@@ -90,31 +91,46 @@ namespace StockWatcher.MerrillLynch
             return req.GetResponse(userAgent, referer, cookies, pageId);
         }
 
-        public SubmitEquityOrderResp TestBuy()
+        public SubmitOrderResp TestBuy()
         {
-            SubmitEquityOrderReq req = new SubmitEquityOrderReq
+            SubmitOrderReq req = new SubmitOrderReq
             {
                 Data = new EquityTradeTicketDisc
                 {
                     EquityTradeTicket = new EquityTradeTicket
                     {
-                        ActionType = SubmitEquityOrderReq.ActionType.Buy,
+                        ActionType = EquityTradeTicketDisc.ActionType.Buy,
                         SymbolId = "TSLA",
                         Quantity = 1,
-                        AccountIdentifier = new Accountidentifier
+                        AccountIdentifier = new AccountIdentifier
                         {
                             Type = "Account",
                             Index = 1
                         },
                         Price = 100,
-                        Duration = SubmitEquityOrderReq.Duration.Day,
-                        OrderType = SubmitEquityOrderReq.OrderType.Limit
+                        Duration = EquityTradeTicketDisc.Duration.Day,
+                        OrderType = EquityTradeTicketDisc.OrderType.Limit,
+                        TLTData = "{\"TaxLotInput\":{\"AccountIndex\":-1,\"Action\":\"\",\"SecurityNumber\":\"\",\"ProductClassCode\":\"\",\"Symbol\":\"\",\"SpecifiedShares\":0,\"TradingSessionEnum\":0},\"Quantity\":0,\"UserSelectionData\":null,\"IsUserDataEntered\":false,\"UserSortedColumn\":\"\",\"UserSortedOrderAsec\":false}"
                     },
+                    Disclaimers = "D439,D440,D450,D351,D955,D1083,D567",
                     SafePassRequest = new SafePassRequest
                     {
                         SafePassFunction = "Trading",
                         CurrentApplication = 1,
+                        ShowSafePassIntroPanel = true,
+                        ShowSafePassEntryPanel = true,
                         SafePassControlClientId = "ctl00_ctl00_ctl00_cphSiteMst_cphNestedPage_cphStage_view1_PilotPreviewConfirmPage_SafePassControl",
+                        IntroHeaderRDN = "RDN_SafePass",
+                        IntroFooterRDN = "RDN_SafePassSectionIntro",
+                        EntryHeaderRDN = "RDN_SafePass",
+                        EntryMidRDN = "RDN_SafePass",
+                        EntryFooterRDN = "RDN_SafePassSectionIntro",
+                        CurrentRUN = "RUN_Equities_OrderPreview",
+                        IsIntroHeaderContentParamsBased = true,
+                        IsIntroFooterContentParamsBased = true,
+                        IsEntryHeaderContentParamsBased = true,
+                        IsEntryFooterContentParamsBased = true,
+                        IsEntryMidContentParamsBased = true,
                         CurrentMode = 9
                     },
                     ReAuthPassword = string.Empty

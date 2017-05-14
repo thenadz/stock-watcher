@@ -4,7 +4,7 @@ using StockWatcher.MerrillLynch.Serializers.Responses;
 namespace StockWatcher.MerrillLynch.Serializers.Requests
 {
     [DataContract]
-    public class CancelEquityOrderReq : AbstractReq<CancelEquityOrderResp>
+    public class CancelOrderReq : AbstractReq<CancelOrderResp>
     {
         [DataMember(Name = "oRequest")]
         public CancelEquityOrderReqData Data { get; set; }

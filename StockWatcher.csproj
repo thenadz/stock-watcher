@@ -49,13 +49,43 @@
   <ItemGroup>
     <Compile Include="IStockScraper.cs" />
     <Compile Include="MerrillLynch\MerrillLynchScraper.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\ReqAccountIdentifier.cs" />
     <Compile Include="MerrillLynch\Serializers\Requests\AbstractReq.cs" />
-    <Compile Include="MerrillLynch\Serializers\Requests\CancelEquityOrderReq.cs" />
-    <Compile Include="MerrillLynch\Serializers\Requests\SubmitEquityOrderReq.cs" />
-    <Compile Include="MerrillLynch\Serializers\Responses\CancelEquityOrderResp.cs" />
-    <Compile Include="MerrillLynch\Serializers\Responses\StockDataResp.cs" />
-    <Compile Include="MerrillLynch\Serializers\Requests\StockDataReq.cs" />
-    <Compile Include="MerrillLynch\Serializers\Responses\SubmitEquityOrderResp.cs" />
+    <Compile Include="MerrillLynch\Serializers\Requests\CancelOrderReq.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\EquityTradeTicket.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\EquityTradeTicketDisc.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\SafePassRequest.cs" />
+    <Compile Include="MerrillLynch\Serializers\Requests\SubmitOrderReq.cs" />
+    <Compile Include="MerrillLynch\Serializers\Requests\ValidateOrderReq.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\RespAccountIdentifier.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\AccountRestriction.cs" />
+    <Compile Include="MerrillLynch\Serializers\Responses\CancelOrderResp.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\CurrentRequest.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\DisplayInfo.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\Displayname.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\EquityTradeTicketCollection.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\Eventlist.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\Financialinstitution.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\Financialservicetype.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\FormattedValues.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\Identifier.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\MessageList.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\QuoteDataStatusCol.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\Sequencesingroup.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\SourceKeys.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\Source_CD.cs" />
+    <Compile Include="MerrillLynch\Serializers\Responses\GetQuoteResp.cs" />
+    <Compile Include="MerrillLynch\Serializers\Requests\GetQuoteReq.cs" />
+    <Compile Include="MerrillLynch\Serializers\Responses\SubmitOrderResp.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\TradeQuoteData.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\TradeQuoteResponse.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\TradeQuoteStatus.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\TradeQuoteTemplate.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\TradeTicketPreview.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\Trait.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\Traitsex.cs" />
+    <Compile Include="MerrillLynch\Serializers\Objects\Ttresponse.cs" />
+    <Compile Include="MerrillLynch\Serializers\Responses\ValidateOrderResp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -71,9 +101,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MerrillLynch\Serializers\Objects\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

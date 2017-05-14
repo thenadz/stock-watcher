@@ -4,7 +4,7 @@ using StockWatcher.MerrillLynch.Serializers.Responses;
 namespace StockWatcher.MerrillLynch.Serializers.Requests
 {
     [DataContract]
-    public class StockDataReq : AbstractReq<StockDataResp>
+    public class GetQuoteReq : AbstractReq<GetQuoteResp>
     {
         [DataMember(Name = "objRequest")]
         public StockDataReqData Data;
@@ -13,7 +13,7 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
             "https://olui2.fs.ml.com/sve/cse/uiservices/PlatformControlService.asmx/GetQuote";
     }
 
-    [DataContract(Name = "objRequest")]
+    [DataContract]
     public class StockDataReqData
     {
         [DataMember(Name = "InstrumentID")]

@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace StockWatcher.MerrillLynch.Serializers.Responses
 {
     [DataContract]
-    public class StockDataResp
+    public class GetQuoteResp
     {
         [DataMember(Name = "d")]
         public StockDataRespData Data { get; set; }
