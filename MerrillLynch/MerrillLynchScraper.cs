@@ -17,7 +17,7 @@ namespace StockWatcher.MerrillLynch
 
         private readonly string password;
 
-        private readonly CookieContainer cookies = new CookieContainer();
+        private CookieContainer cookies;
 
         private ChromeDriverService driverService;
 
@@ -60,21 +60,49 @@ namespace StockWatcher.MerrillLynch
                 Thread.Sleep(250);
             }
 
-            // store cookies
+            UpdateCookies();
+            UpdatePageId();
+        }
+
+        private void NavigateTo(string uri)
+        {
+            driver.Url = uri;
+            driver.Navigate();
+
+            UpdatePageId();
+            UpdateCookies();
+        }
+
+        private TResponse ExecuteRequest<TResponse>(AbstractReq<TResponse> req)
+            where TResponse : class
+        {
+            if (req.RequestReferer != null)
+            {
+                NavigateTo(req.RequestReferer);
+            }
+
+            return req.GetResponse(userAgent, new Uri(driver.Url), cookies, pageId);
+        }
+
+        private void UpdatePageId()
+        {
+            pageId = driver.FindElementById("__PageIdField").GetAttribute("value");
+        }
+
+        private void UpdateCookies()
+        {
+            cookies = new CookieContainer();
             foreach (OpenQA.Selenium.Cookie c in driver.Manage().Cookies.AllCookies)
             {
                 string name = c.Name;
                 string value = c.Value;
                 cookies.Add(new System.Net.Cookie(name, value, c.Path, c.Domain));
             }
-
-            pageId = driver.FindElementById("__PageIdField").GetAttribute("value");
-            driverService.Dispose();
         }
 
         public GetQuoteResp TestGetData()
         {
-            GetQuoteReq req = new GetQuoteReq
+            return ExecuteRequest(new GetQuoteReq
             {
                 Data = new StockDataReqData
                 {
@@ -85,24 +113,22 @@ namespace StockWatcher.MerrillLynch
                         InstrumentID = ""
                     }
                 }
-            };
-
-            Uri referer = new Uri("https://olui2.fs.ml.com/TFPSummary/PortfolioSimpleView.aspx");
-            return req.GetResponse(userAgent, referer, cookies, pageId);
+            });
         }
 
         public SubmitOrderResp TestBuy()
         {
-            SubmitOrderReq req = new SubmitOrderReq
+            ValidateOrderResp vresp = ExecuteRequest(new ValidateOrderReq
             {
                 Data = new EquityTradeTicketDisc
                 {
-                    EquityTradeTicket = new EquityTradeTicket
+                    EquityTradeTicket = new EquityTradeTicket(true)
                     {
                         ActionType = EquityTradeTicketDisc.ActionType.Buy,
+                        ExecutionContextIndex = "6",
                         SymbolId = "TSLA",
                         Quantity = 1,
-                        AccountIdentifier = new AccountIdentifier
+                        AccountIdentifier = new ReqAccountIdentifier
                         {
                             Type = "Account",
                             Index = 1
@@ -110,7 +136,8 @@ namespace StockWatcher.MerrillLynch
                         Price = 100,
                         Duration = EquityTradeTicketDisc.Duration.Day,
                         OrderType = EquityTradeTicketDisc.OrderType.Limit,
-                        TLTData = "{\"TaxLotInput\":{\"AccountIndex\":-1,\"Action\":\"\",\"SecurityNumber\":\"\",\"ProductClassCode\":\"\",\"Symbol\":\"\",\"SpecifiedShares\":0,\"TradingSessionEnum\":0},\"Quantity\":0,\"UserSelectionData\":null,\"IsUserDataEntered\":false,\"UserSortedColumn\":\"\",\"UserSortedOrderAsec\":false}"
+                        TLTData =
+                            "{\"TaxLotInput\":{\"AccountIndex\":-1,\"Action\":\"\",\"SecurityNumber\":\"\",\"ProductClassCode\":\"\",\"Symbol\":\"\",\"SpecifiedShares\":0,\"TradingSessionEnum\":0},\"Quantity\":0,\"UserSelectionData\":null,\"IsUserDataEntered\":false,\"UserSortedColumn\":\"\",\"UserSortedOrderAsec\":false}"
                     },
                     Disclaimers = "D439,D440,D450,D351,D955,D1083,D567",
                     SafePassRequest = new SafePassRequest
@@ -119,7 +146,8 @@ namespace StockWatcher.MerrillLynch
                         CurrentApplication = 1,
                         ShowSafePassIntroPanel = true,
                         ShowSafePassEntryPanel = true,
-                        SafePassControlClientId = "ctl00_ctl00_ctl00_cphSiteMst_cphNestedPage_cphStage_view1_PilotPreviewConfirmPage_SafePassControl",
+                        SafePassControlClientId =
+                            "ctl00_ctl00_ctl00_cphSiteMst_cphNestedPage_cphStage_view1_PilotPreviewConfirmPage_SafePassControl",
                         IntroHeaderRDN = "RDN_SafePass",
                         IntroFooterRDN = "RDN_SafePassSectionIntro",
                         EntryHeaderRDN = "RDN_SafePass",
@@ -132,13 +160,60 @@ namespace StockWatcher.MerrillLynch
                         IsEntryFooterContentParamsBased = true,
                         IsEntryMidContentParamsBased = true,
                         CurrentMode = 9
-                    },
-                    ReAuthPassword = string.Empty
+                    }
                 }
-            };
+            });
 
-            Uri referer = new Uri("https://olui2.fs.ml.com/TFPSummary/PortfolioSimpleView.aspx");
-            return req.GetResponse(userAgent, referer, cookies, pageId);
+            return ExecuteRequest(new SubmitOrderReq
+            {
+                Data = new EquityTradeTicketDisc
+                {
+                    EquityTradeTicket = new EquityTradeTicket(false)
+                    {
+                        ActionType = EquityTradeTicketDisc.ActionType.Buy,
+                        ExecutionContextIndex = "6",
+                        SymbolId = "TSLA",
+                        Quantity = 1,
+                        AccountIdentifier = new ReqAccountIdentifier
+                        {
+                            Type = "Account",
+                            Index = 1
+                        },
+                        Price = 100,
+                        Duration = EquityTradeTicketDisc.Duration.Day,
+                        OrderType = EquityTradeTicketDisc.OrderType.Limit,
+                        TLTData =
+                            "{\"TaxLotInput\":{\"AccountIndex\":-1,\"Action\":\"\",\"SecurityNumber\":\"\",\"ProductClassCode\":\"\",\"Symbol\":\"\",\"SpecifiedShares\":0,\"TradingSessionEnum\":0},\"Quantity\":0,\"UserSelectionData\":null,\"IsUserDataEntered\":false,\"UserSortedColumn\":\"\",\"UserSortedOrderAsec\":false}"
+                    },
+                    Disclaimers = "D439,D440,D450,D351,D955,D1083,D567",
+                    SafePassRequest = new SafePassRequest
+                    {
+                        SafePassFunction = "Trading",
+                        CurrentApplication = 1,
+                        ShowSafePassIntroPanel = true,
+                        ShowSafePassEntryPanel = true,
+                        SafePassControlClientId =
+                            "ctl00_ctl00_ctl00_cphSiteMst_cphNestedPage_cphStage_view1_PilotPreviewConfirmPage_SafePassControl",
+                        IntroHeaderRDN = "RDN_SafePass",
+                        IntroFooterRDN = "RDN_SafePassSectionIntro",
+                        EntryHeaderRDN = "RDN_SafePass",
+                        EntryMidRDN = "RDN_SafePass",
+                        EntryFooterRDN = "RDN_SafePassSectionIntro",
+                        CurrentRUN = "RUN_Equities_OrderPreview",
+                        IsIntroHeaderContentParamsBased = true,
+                        IsIntroFooterContentParamsBased = true,
+                        IsEntryHeaderContentParamsBased = true,
+                        IsEntryFooterContentParamsBased = true,
+                        IsEntryMidContentParamsBased = true,
+                        CurrentMode = 9
+                    }
+                }
+            });
+        }
+
+        public void Dispose()
+        {
+            driverService?.Dispose();
         }
     }
 }

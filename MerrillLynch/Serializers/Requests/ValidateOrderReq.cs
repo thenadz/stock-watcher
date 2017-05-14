@@ -12,5 +12,7 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
 
         public override string RequestUri { get; } =
             "https://olui2.fs.ml.com/Equities/UIServices/PilotEquitiesUIService.asmx/ValidateEquityOrder";
+
+        public override string RequestReferer { get; } = "https://olui2.fs.ml.com/Equities/OrderEntry.aspx";
     }
 }

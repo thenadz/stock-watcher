@@ -11,6 +11,8 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
 
         public override string RequestUri { get; } =
             "https://olui2.fs.ml.com/OrderStatus/UIServices/OrderStatusService.asmx/CancelOrder";
+
+        public override string RequestReferer { get; } = "https://olui2.fs.ml.com/OrderStatus/OrderStatus.aspx";
     }
 
     [DataContract]

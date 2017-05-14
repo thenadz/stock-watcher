@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.Serialization;
 
 namespace StockWatcher.MerrillLynch.Serializers.Objects
@@ -207,10 +208,10 @@ namespace StockWatcher.MerrillLynch.Serializers.Objects
         public string FCWireCall { get; set; }
 
         [DataMember(Name = "SequenceNumber")]
-        public int SequenceNumber { get; set; }
+        public int? SequenceNumber { get; set; }
 
         [DataMember(Name = "RevisionNumber")]
-        public object RevisionNumber { get; set; }
+        public int? RevisionNumber { get; set; }
 
         [DataMember(Name = "IsProfessional")]
         public bool IsProfessional { get; set; }
@@ -267,10 +268,10 @@ namespace StockWatcher.MerrillLynch.Serializers.Objects
         public string OrderId { get; set; }
 
         [DataMember(Name = "UserSubmissionDate")]
-        public object UserSubmissionDate { get; set; }
+        public DateTime? UserSubmissionDate { get; set; }
 
         [DataMember(Name = "FulfillmentTotal")]
-        public object FulfillmentTotal { get; set; }
+        public float? FulfillmentTotal { get; set; }
 
         [DataMember(Name = "IsTradeEnabled")]
         public bool IsTradeEnabled { get; set; }

@@ -6,19 +6,31 @@ namespace StockWatcher.MerrillLynch.Serializers.Objects
     [DataContract]
     public class EquityTradeTicket
     {
+        private readonly bool enumsAsInts;
+
+        public EquityTradeTicket(bool enumsAsInts)
+        {
+            this.enumsAsInts = enumsAsInts;
+
+            // Default values least likely to get people into trouble when learning the library
+            ActionType = EquityTradeTicketDisc.ActionType.Sell;
+            Duration = EquityTradeTicketDisc.Duration.Day;
+            OrderType = EquityTradeTicketDisc.OrderType.Market;
+        }
+
         [DataMember(Name = "ActionType")]
-        private string actionType = EquityTradeTicketDisc.ActionType.Sell.ToString();
+        private object actionType;
 
         public EquityTradeTicketDisc.ActionType ActionType
         {
             get
             {
-                return (EquityTradeTicketDisc.ActionType)Enum.Parse(typeof(EquityTradeTicketDisc.ActionType), actionType);
+                return (EquityTradeTicketDisc.ActionType)(enumsAsInts ? actionType : Enum.Parse(typeof(EquityTradeTicketDisc.ActionType), (string)actionType));
             }
 
             set
             {
-                actionType = value.ToString();
+                actionType = enumsAsInts ? (object)(int)value : value.ToString();
             }
         }
 
@@ -26,7 +38,7 @@ namespace StockWatcher.MerrillLynch.Serializers.Objects
         public string SymbolId { get; set; }
 
         [DataMember(Name = "ExecutionContextIndex")]
-        public int ExecutionContextIndex { get; set; }
+        public object ExecutionContextIndex { get; set; }
 
         [DataMember(Name = "Quantity")]
         public int Quantity { get; set; }
@@ -35,40 +47,40 @@ namespace StockWatcher.MerrillLynch.Serializers.Objects
         public ReqAccountIdentifier AccountIdentifier { get; set; }
 
         [DataMember(Name = "Price")]
-        public float Price { get; set; }
+        public int Price { get; set; }
 
         [DataMember(Name = "IsAllOrNone")]
         public bool IsAllOrNone { get; set; }
 
         [DataMember(Name = "Duration")]
-        private string duration = EquityTradeTicketDisc.Duration.Day.ToString();
+        private object duration;
 
         public EquityTradeTicketDisc.Duration Duration
         {
             get
             {
-                return (EquityTradeTicketDisc.Duration)Enum.Parse(typeof(EquityTradeTicketDisc.Duration), duration);
+                return (EquityTradeTicketDisc.Duration)(enumsAsInts ? duration : Enum.Parse(typeof(EquityTradeTicketDisc.Duration), (string)duration));
             }
 
             set
             {
-                duration = value.ToString();
+                duration = enumsAsInts ? (object)(int)value : value.ToString();
             }
         }
 
         [DataMember(Name = "OrderType")]
-        private string orderType = EquityTradeTicketDisc.OrderType.Market.ToString();
+        private object orderType;
 
         public EquityTradeTicketDisc.OrderType OrderType
         {
             get
             {
-                return (EquityTradeTicketDisc.OrderType)Enum.Parse(typeof(EquityTradeTicketDisc.OrderType), orderType);
+                return (EquityTradeTicketDisc.OrderType)(enumsAsInts ? orderType : Enum.Parse(typeof(EquityTradeTicketDisc.OrderType), (string)orderType));
             }
 
             set
             {
-                orderType = value.ToString();
+                orderType = enumsAsInts ? (object)(int)value : value.ToString();
             }
         }
 

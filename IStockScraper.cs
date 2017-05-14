@@ -1,6 +1,8 @@
-﻿namespace StockWatcher
+﻿using System;
+
+namespace StockWatcher
 {
-    interface IStockScraper
+    interface IStockScraper : IDisposable
     {
         void Start();
     }

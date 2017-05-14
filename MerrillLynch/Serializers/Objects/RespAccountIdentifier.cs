@@ -115,10 +115,10 @@ namespace StockWatcher.MerrillLynch.Serializers.Objects
         public Identifier Identifier { get; set; }
 
         [DataMember(Name = "IsActive")]
-        public bool IsActive { get; set; }
+        public bool? IsActive { get; set; }
 
         [DataMember(Name = "OpenDate")]
-        public DateTime OpenDate { get; set; }
+        public DateTime? OpenDate { get; set; }
 
         [DataMember(Name = "OwnershipType")]
         public string OwnershipType { get; set; }

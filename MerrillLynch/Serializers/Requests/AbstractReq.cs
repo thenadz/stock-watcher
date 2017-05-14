@@ -17,6 +17,8 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
 
         public abstract string RequestUri { get; }
 
+        public virtual string RequestReferer { get; } = null;
+
         public virtual string RequestMethod { get; } = "POST";
 
         private JsonSerializer Serializer => serializer ?? (serializer = new JsonSerializer());
