@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using StockWatcher.MerrillLynch.Serializers.Responses;
 
 namespace StockWatcher.MerrillLynch.Serializers.Requests
@@ -13,7 +14,7 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
         public enum OrderType { Market, Limit, StopLimit, TrailingStopPercent, TrailingStopDollar, TrailingStopLimitPercent, TrailingStopLimitDollar }
 
         [DataMember(Name = "equityTradeTicketDisc")]
-        public EquityTradeTicketDisc EquityTradeTicketDisc { get; set; }
+        public EquityTradeTicketDisc Data { get; set; }
 
         public override string RequestUri { get; } =
             "https://olui2.fs.ml.com/Equities/UIServices/PilotEquitiesUIService.asmx/SubmitEquityOrder";
@@ -39,7 +40,20 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
     public class EquityTradeTicket
     {
         [DataMember(Name = "ActionType")]
-        public SubmitEquityOrderReq.ActionType ActionType { get; set; }
+        private string actionType = SubmitEquityOrderReq.ActionType.Sell.ToString();
+
+        public SubmitEquityOrderReq.ActionType ActionType
+        {
+            get
+            {
+                return (SubmitEquityOrderReq.ActionType)Enum.Parse(typeof(SubmitEquityOrderReq.ActionType), actionType);
+            }
+
+            set
+            {
+                actionType = value.ToString();
+            }
+        }
 
         [DataMember(Name = "SymbolId")]
         public string SymbolId { get; set; }
@@ -60,10 +74,36 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
         public bool IsAllOrNone { get; set; }
 
         [DataMember(Name = "Duration")]
-        public SubmitEquityOrderReq.Duration Duration { get; set; }
+        private string duration = SubmitEquityOrderReq.Duration.Day.ToString();
+
+        public SubmitEquityOrderReq.Duration Duration
+        {
+            get
+            {
+                return (SubmitEquityOrderReq.Duration)Enum.Parse(typeof(SubmitEquityOrderReq.Duration), duration);
+            }
+
+            set
+            {
+                duration = value.ToString();
+            }
+        }
 
         [DataMember(Name = "OrderType")]
-        public SubmitEquityOrderReq.OrderType OrderType { get; set; }
+        private string orderType = SubmitEquityOrderReq.OrderType.Market.ToString();
+
+        public SubmitEquityOrderReq.OrderType OrderType
+        {
+            get
+            {
+                return (SubmitEquityOrderReq.OrderType)Enum.Parse(typeof(SubmitEquityOrderReq.OrderType), orderType);
+            }
+
+            set
+            {
+                orderType = value.ToString();
+            }
+        }
 
         [DataMember(Name = "SimilarOrderAcknowledged")]
         public bool SimilarOrderAcknowledged { get; set; }
