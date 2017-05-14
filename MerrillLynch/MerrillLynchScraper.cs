@@ -71,7 +71,7 @@ namespace StockWatcher.MerrillLynch
             driverService.Dispose();
         }
 
-        public void TestGetData()
+        public StockDataResp TestGetData()
         {
             StockDataReq req = new StockDataReq
             {
@@ -87,12 +87,42 @@ namespace StockWatcher.MerrillLynch
             };
 
             Uri referer = new Uri("https://olui2.fs.ml.com/TFPSummary/PortfolioSimpleView.aspx");
-            StockDataResp data = req.GetResponse(userAgent, referer, cookies, pageId);
+            return req.GetResponse(userAgent, referer, cookies, pageId);
         }
 
-        public void TestBuy()
+        public SubmitEquityOrderResp TestBuy()
         {
-            // TODO
+            SubmitEquityOrderReq req = new SubmitEquityOrderReq
+            {
+                Data = new EquityTradeTicketDisc
+                {
+                    EquityTradeTicket = new EquityTradeTicket
+                    {
+                        ActionType = SubmitEquityOrderReq.ActionType.Buy,
+                        SymbolId = "TSLA",
+                        Quantity = 1,
+                        AccountIdentifier = new Accountidentifier
+                        {
+                            Type = "Account",
+                            Index = 1
+                        },
+                        Price = 100,
+                        Duration = SubmitEquityOrderReq.Duration.Day,
+                        OrderType = SubmitEquityOrderReq.OrderType.Limit
+                    },
+                    SafePassRequest = new SafePassRequest
+                    {
+                        SafePassFunction = "Trading",
+                        CurrentApplication = 1,
+                        SafePassControlClientId = "ctl00_ctl00_ctl00_cphSiteMst_cphNestedPage_cphStage_view1_PilotPreviewConfirmPage_SafePassControl",
+                        CurrentMode = 9
+                    },
+                    ReAuthPassword = string.Empty
+                }
+            };
+
+            Uri referer = new Uri("https://olui2.fs.ml.com/TFPSummary/PortfolioSimpleView.aspx");
+            return req.GetResponse(userAgent, referer, cookies, pageId);
         }
     }
 }
