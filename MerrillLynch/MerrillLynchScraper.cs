@@ -1,16 +1,21 @@
 ﻿using System;
+using System.IO;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using StockWatcher.MerrillLynch.Serializers.Objects;
 using StockWatcher.MerrillLynch.Serializers.Requests;
 using StockWatcher.MerrillLynch.Serializers.Responses;
+using Cookie = System.Net.Cookie;
 
 namespace StockWatcher.MerrillLynch
 {
     public class MerrillLynchScraper : IStockScraper
     {
+        private static readonly Regex PageIdRegex = new Regex(@"<input (?:[^>]* )?id=""__PageIdField"" (?:[^>]* )?value=""([^""]*)""[^>]*/>", RegexOptions.Compiled);
+
         private readonly string userAgent;
 
         private readonly string username;
@@ -66,11 +71,26 @@ namespace StockWatcher.MerrillLynch
 
         private void NavigateTo(string uri)
         {
-            driver.Url = uri;
-            driver.Navigate();
+            HttpWebRequest hwr = (HttpWebRequest)WebRequest.Create(uri);
+            hwr.CookieContainer = cookies;
+            hwr.Method = "GET";
 
-            UpdatePageId();
-            UpdateCookies();
+            hwr.UserAgent = userAgent;
+            hwr.ContentType = "application/json; charset=UTF-8";
+            hwr.Headers.Add("X-Requested-With: XMLHttpRequest");
+            hwr.Headers.Add($"__PageIdHeader: {pageId}");
+            hwr.Accept = "*/*";
+            hwr.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+
+            HttpWebResponse resp = (HttpWebResponse)hwr.GetResponse();
+
+            using (StreamReader rdr = new StreamReader(resp.GetResponseStream()))
+            {
+                string result = rdr.ReadToEnd();
+                UpdatePageId(PageIdRegex.Match(result).Groups[1].Value);
+            }
+
+            UpdateCookies(resp.Cookies);
         }
 
         private TResponse ExecuteRequest<TResponse>(AbstractReq<TResponse> req)
@@ -84,9 +104,9 @@ namespace StockWatcher.MerrillLynch
             return req.GetResponse(userAgent, new Uri(driver.Url), cookies, pageId);
         }
 
-        private void UpdatePageId()
+        private void UpdatePageId(string pageId = null)
         {
-            pageId = driver.FindElementById("__PageIdField").GetAttribute("value");
+            this.pageId = pageId ?? driver.FindElementById("__PageIdField").GetAttribute("value");
         }
 
         private void UpdateCookies()
@@ -96,7 +116,15 @@ namespace StockWatcher.MerrillLynch
             {
                 string name = c.Name;
                 string value = c.Value;
-                cookies.Add(new System.Net.Cookie(name, value, c.Path, c.Domain));
+                cookies.Add(new Cookie(name, value, c.Path, c.Domain));
+            }
+        }
+
+        private void UpdateCookies(CookieCollection cookies)
+        {
+            foreach (Cookie cookie in cookies)
+            {
+                this.cookies.Add(cookie);
             }
         }
 
