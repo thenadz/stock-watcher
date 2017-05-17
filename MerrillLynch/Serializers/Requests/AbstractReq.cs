@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.Http.Formatting;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
@@ -10,6 +11,10 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
     public abstract class AbstractReq<TResponse>
         where TResponse : class
     {
+        public const string JsonMimeType = "application/json";
+
+        public const string FormUrlEncodedMimeType = "application/x-www-form-urlencoded";
+
         /// <summary>
         /// Don't access directly. Use wrapper property.
         /// </summary>
@@ -19,7 +24,12 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
 
         public virtual string RequestReferer { get; } = null;
 
+        public virtual string MimeType { get; } = JsonMimeType;
+
         public virtual string RequestMethod { get; } = "POST";
+
+        // NOTE: Required for non-JSON requests
+        public virtual MediaTypeFormatter Formatter { get; } = null;
 
         private JsonSerializer Serializer => serializer ?? (serializer = new JsonSerializer());
 
@@ -33,18 +43,33 @@ namespace StockWatcher.MerrillLynch.Serializers.Requests
             hwr.KeepAlive = true;
             hwr.Headers.Add($"Origin: {referer.GetLeftPart(UriPartial.Authority)}");
             hwr.UserAgent = userAgent;
-            hwr.ContentType = "application/json; charset=UTF-8";
-            hwr.Headers.Add("X-Requested-With: XMLHttpRequest");
+            hwr.ContentType = MimeType;
             hwr.Headers.Add($"__PageIdHeader: {pageId}");
             hwr.Accept = "*/*";
             hwr.Referer = referer.OriginalString;
             hwr.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
             // serialize request to the wire
-            using (StreamWriter writer = new StreamWriter(hwr.GetRequestStream()))
-            using (JsonTextWriter jwriter = new JsonTextWriter(writer))
+            Stream reqStream = hwr.GetRequestStream();
+            switch (MimeType)
             {
-                Serializer.Serialize(jwriter, this);
+                // JSON requests handled here
+                case JsonMimeType:
+                {
+                    using (StreamWriter writer = new StreamWriter(reqStream))
+                    using (JsonTextWriter jwriter = new JsonTextWriter(writer))
+                    {
+                        Serializer.Serialize(jwriter, this);
+                    }
+                    break;
+                }
+
+                // non-JSON requests handled here
+                default:
+                {
+                    Formatter.WriteToStreamAsync(GetType(), this, reqStream, null, null).Wait();
+                    break;
+                }
             }
 
             // deserialize response from the wire

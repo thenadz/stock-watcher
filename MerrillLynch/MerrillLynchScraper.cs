@@ -76,8 +76,6 @@ namespace StockWatcher.MerrillLynch
             hwr.Method = "GET";
 
             hwr.UserAgent = userAgent;
-            hwr.ContentType = "application/json; charset=UTF-8";
-            hwr.Headers.Add("X-Requested-With: XMLHttpRequest");
             hwr.Headers.Add($"__PageIdHeader: {pageId}");
             hwr.Accept = "*/*";
             hwr.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
